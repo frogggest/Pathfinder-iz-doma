@@ -166,30 +166,6 @@ body{margin:0;font-family:system-ui,-apple-system,sans-serif;background:#1a1a1a;
   border:1px solid #333;border-radius:6px;padding:6px 10px;
   font-size:11px;color:#888;z-index:5;max-width:340px;
 }
-
-/* ===== МУЗЫКА ===== */
-#music-panel{
-  margin-top:12px;padding-top:12px;border-top:1px solid #333;
-}
-#music-panel h3{margin:0 0 8px;color:#d4a95a;font-size:14px}
-.music-input-row{display:flex;gap:4px;margin-bottom:8px}
-#yt-url{
-  flex:1;background:#1a1a1a;color:#e0e0e0;border:1px solid #444;
-  padding:5px 8px;border-radius:4px;font-size:12px;min-width:0;
-}
-#yt-url:focus{outline:none;border-color:#d4a95a}
-#btn-yt-load{
-  background:#d4a95a;color:#1a1a1a;border:none;padding:5px 10px;
-  border-radius:4px;cursor:pointer;font-weight:bold;font-size:12px;
-}
-#btn-yt-load:hover{background:#e0b96a}
-#yt-embed{
-  height:140px;background:#000;border-radius:4px;overflow:hidden;
-  display:flex;align-items:center;justify-content:center;
-}
-#yt-embed iframe{width:100%;height:100%;border:0;display:block}
-.music-empty{color:#555;font-size:11px;text-align:center;padding:10px}
-.music-hint{font-size:10px;color:#666;margin-top:4px;line-height:1.3}
 </style>
 </head>
 <body>
@@ -246,19 +222,6 @@ body{margin:0;font-family:system-ui,-apple-system,sans-serif;background:#1a1a1a;
 <div id="dice-panel">
   <h3>Результаты броска</h3>
   <div id="dice-result"><span style="color:#666;font-size:12px">Ещё не бросали</span></div>
-
-  <!-- ===== МУЗЫКА ===== -->
-  <div id="music-panel">
-    <h3>Музыка (YouTube)</h3>
-    <div class="music-input-row">
-      <input type="text" id="yt-url" placeholder="Ссылка на видео или плейлист">
-      <button id="btn-yt-load">OK</button>
-    </div>
-    <div id="yt-embed">
-      <div class="music-empty">Вставь ссылку и нажми OK</div>
-    </div>
-    <div class="music-hint">Видео/плейлист появится здесь. Каждый игрок вставляет ту же ссылку у себя.</div>
-  </div>
 </div>
 
 <script>
@@ -342,49 +305,6 @@ diceBtn.onclick = ()=>{
   for(let i=0;i<n;i++) rolls.push(1+Math.floor(Math.random()*6));
   diceResult.innerHTML = rolls.map(r=>`<span class="die ${r>=5?'high':''}">${r}</span>`).join('');
 };
-
-// ===== МУЗЫКА (YouTube) =====
-const ytUrlInput = document.getElementById('yt-url');
-const btnYtLoad = document.getElementById('btn-yt-load');
-const ytEmbed = document.getElementById('yt-embed');
-
-function loadYT(){
-  const url = ytUrlInput.value.trim();
-  if(!url){ alert('Вставьте ссылку на YouTube'); return; }
-
-  let embedUrl = '';
-
-  // Плейлист
-  const listMatch = url.match(/[?&]list=([a-zA-Z0-9_-]+)/);
-  if(listMatch && !url.match(/[?&]v=/)){
-    embedUrl = 'https://www.youtube.com/embed/videoseries?list=' + listMatch[1] + '&autoplay=1&rel=0';
-  } else {
-    // Одиночное видео
-    let vid = '';
-    let m = url.match(/(?:youtu\.be\/|v=|embed\/)([a-zA-Z0-9_-]{11})/);
-    if(m) vid = m[1];
-    // Если видео внутри плейлиста — можно передать и list
-    if(vid){
-      embedUrl = 'https://www.youtube.com/embed/' + vid + '?autoplay=1&rel=0';
-      if(listMatch) embedUrl += '&list=' + listMatch[1];
-    }
-  }
-
-  if(!embedUrl){
-    alert('Не удалось распознать ссылку.\nВставьте ссылку вида:\nhttps://youtu.be/XXXX\nили\nhttps://www.youtube.com/playlist?list=XXXX');
-    return;
-  }
-
-  ytEmbed.innerHTML =
-    '<iframe src="' + embedUrl + '" ' +
-    'allow="autoplay; encrypted-media; picture-in-picture" ' +
-    'allowfullscreen></iframe>';
-}
-
-btnYtLoad.onclick = loadYT;
-ytUrlInput.addEventListener('keydown', e=>{
-  if(e.key === 'Enter') loadYT();
-});
 
 // ===== ДОСКА (карта) =====
 const board = document.getElementById('board');
