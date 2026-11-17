@@ -33,13 +33,15 @@ body{margin:0;font-family:system-ui,-apple-system,sans-serif;background:#1a1a1a;
   width:30px;height:30px;border-radius:50%;cursor:pointer;
   border:2px solid #fff;box-shadow:0 0 0 2px #333;
   padding:0;background:#e05a5a;transition:transform .1s;
+  display:inline-block;vertical-align:middle;
 }
+#toolbar #color-picker-wrap{flex-shrink:0}
 #color-current:hover{transform:scale(1.1)}
 
 #palette-popup{
-  position:absolute;top:42px;left:0;
+  position:fixed;top:56px;
   background:#2a2a2a;border:1px solid #444;border-radius:8px;
-  padding:10px;z-index:100;width:230px;
+  padding:10px;z-index:1000;width:230px;
   box-shadow:0 8px 30px rgba(0,0,0,.8);
   display:none;
 }
@@ -282,6 +284,9 @@ updateHuePreview(0);
 // открытие/закрытие палитры
 colorCurrent.onclick = e=>{
   e.stopPropagation();
+  const rect = colorCurrent.getBoundingClientRect();
+  palettePopup.style.left = rect.left + 'px';
+  palettePopup.style.top = (rect.bottom + 6) + 'px';
   palettePopup.classList.toggle('open');
 };
 document.addEventListener('click', e=>{
