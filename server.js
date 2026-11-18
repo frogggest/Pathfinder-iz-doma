@@ -38,10 +38,11 @@ const server = http.createServer((req, res) => {
   });
 });
 
-// Увеличиваем лимит размера сообщения для картинок (по умолчанию 100 МБ)
+// Увеличиваем лимит сообщения до 50 МБ для передачи картинок
 const wss = new WebSocketServer({ server, maxPayload: 50 * 1024 * 1024 });
 
 wss.on('connection', (ws) => {
+  // При подключении отправляем ВСЁ накопленное состояние
   ws.send(JSON.stringify({
     type: 'init',
     state: gameState
@@ -64,7 +65,7 @@ wss.on('connection', (ws) => {
         broadcast({ type: 'map', url: data.url }, null);
       }
       else if (data.type === 'roll') {
-        gameState.diceHistory.push(data.roll);
+        gameState.diceHistory = data.roll;
         broadcast({ type: 'roll', roll: data.roll }, ws);
       }
       else if (data.type === 'char') {
