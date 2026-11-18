@@ -38,7 +38,8 @@ const server = http.createServer((req, res) => {
   });
 });
 
-const wss = new WebSocketServer({ server });
+// Увеличиваем лимит размера сообщения для картинок (по умолчанию 100 МБ)
+const wss = new WebSocketServer({ server, maxPayload: 50 * 1024 * 1024 });
 
 wss.on('connection', (ws) => {
   ws.send(JSON.stringify({
