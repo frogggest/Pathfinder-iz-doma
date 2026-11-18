@@ -292,6 +292,7 @@ function loadMap(src, isRemote) {
     ws.send(JSON.stringify({ type: 'map', url: src }));
   }
   
+  bgImg.style.display = 'block'; // На случай, если карта была удалена
   bgImg.src = src;
   bgImg.onload = () => {
     dropZone.style.display = 'none';
@@ -422,14 +423,13 @@ document.getElementById('btn-clear').onclick = () => {
 document.getElementById('btn-clear-map').onclick = () => {
   if (!confirm('Удалить карту для всех?')) return;
   
-  // Очищаем у себя
   bgImg.src = '';
   bgImg.style.display = 'none';
   dropZone.style.display = 'flex';
-  resetCanvas(0, 0); // Сбрасываем размеры и рисунки
+  // Не трогаем canvas.width и canvas.height, просто очищаем рисунок
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+  history = [];
   
-  // Отправляем на сервер
   if (ws && ws.readyState === WebSocket.OPEN) {
     ws.send(JSON.stringify({ type: 'clear_map' }));
   }
@@ -624,8 +624,8 @@ ws.onmessage = (event) => {
     bgImg.src = '';
     bgImg.style.display = 'none';
     dropZone.style.display = 'flex';
-    resetCanvas(0, 0);
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    history = [];
   }
   else if (data.type === 'draw') drawLine(data.line);
   else if (data.type === 'clear_drawings') ctx.clearRect(0, 0, canvas.width, canvas.height);
