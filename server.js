@@ -51,7 +51,11 @@ wss.on('connection', (ws) => {
   ws.on('message', (message) => {
     try {
       const data = JSON.parse(message);
-
+  if (data.type === 'clear_map') {
+        gameState.mapUrl = null;
+        gameState.drawings = []; // При смене карты логично очистить рисунки
+        broadcast({ type: 'clear_map' }, null);
+      }
       if (data.type === 'draw') {
         gameState.drawings.push(data.line);
         broadcast({ type: 'draw', line: data.line }, ws);
