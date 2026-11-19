@@ -2,19 +2,19 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>Игровой стол</title>
 <style>
-*{box-sizing:border-box}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{margin:0;font-family:system-ui,-apple-system,sans-serif;background:#1a1a1a;color:#e0e0e0;overflow:hidden;height:100vh;display:flex;flex-direction:column}
 #toolbar{height:56px;background:#242424;border-bottom:1px solid #333;display:flex;align-items:center;gap:10px;padding:0 12px;z-index:10;flex-shrink:0;overflow-x:auto;position:relative}
-#toolbar button{background:#d4a95a;color:#1a1a1a;border:none;padding:6px 12px;border-radius:4px;cursor:pointer;font-weight:bold;font-size:13px;white-space:nowrap}
+#toolbar button{background:#d4a95a;color:#1a1a1a;border:none;padding:6px 12px;border-radius:4px;cursor:pointer;font-weight:bold;font-size:13px;white-space:nowrap;flex-shrink:0}
 #toolbar button:hover{background:#e0b96a}
 #toolbar button.secondary{background:#444;color:#e0e0e0}
 #toolbar button.secondary:hover{background:#555}
-#toolbar input[type=number]{width:60px;background:#1a1a1a;color:#e0e0e0;border:1px solid #444;padding:5px 8px;border-radius:4px;font-size:13px;text-align:center}
-#toolbar label{font-size:13px;color:#aaa;white-space:nowrap}
-#color-picker-wrap{position:relative}
+#toolbar input[type=number]{width:60px;background:#1a1a1a;color:#e0e0e0;border:1px solid #444;padding:5px 8px;border-radius:4px;font-size:13px;text-align:center;flex-shrink:0}
+#toolbar label{font-size:13px;color:#aaa;white-space:nowrap;flex-shrink:0}
+#color-picker-wrap{position:relative;flex-shrink:0}
 #color-current{width:30px;height:30px;border-radius:50%;cursor:pointer;border:2px solid #fff;box-shadow:0 0 0 2px #333;padding:0;background:#e05a5a;transition:transform .1s;display:inline-block;vertical-align:middle}
 #color-current:hover{transform:scale(1.1)}
 #palette-popup{position:fixed;background:#2a2a2a;border:1px solid #444;border-radius:8px;padding:10px;z-index:1000;width:230px;box-shadow:0 8px 30px rgba(0,0,0,.8);display:none}
@@ -29,13 +29,15 @@ body{margin:0;font-family:system-ui,-apple-system,sans-serif;background:#1a1a1a;
 .hue-preview{display:flex;gap:3px;margin-top:8px;height:26px}
 .hue-preview .swatch{flex:1;border-radius:3px;cursor:pointer;border:1px solid rgba(0,0,0,.3);transition:transform .1s}
 .hue-preview .swatch:hover{transform:scaleY(1.2);position:relative;z-index:1}
-#main{display:flex;flex:1;overflow:hidden}
-#board{flex:1;position:relative;background:#111;overflow:hidden}
-#drop-zone{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#666;font-size:16px;pointer-events:none;text-align:center;padding:20px}
-#drop-zone.dragover{color:#d4a95a;background:#1a1a1a}
+#main{display:flex;flex:1;overflow:hidden;position:relative}
+.mobile-pane {display:none; flex-direction:column; flex:1; overflow:hidden; width:100%;}
+.mobile-pane.active {display:flex;}
+#desktop-layout {display:flex; flex:1; overflow:hidden;}
+#board{flex:1;position:relative;background:#111;overflow:hidden;display:flex;flex-direction:column}
 #canvas-wrap{position:absolute;top:0;left:0;transform-origin:0 0;cursor:crosshair}
 #bg-image{display:block;user-select:none;-webkit-user-drag:none;pointer-events:none}
 #draw-canvas{position:absolute;top:0;left:0;cursor:crosshair;touch-action:none}
+#drop-zone{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#666;font-size:16px;pointer-events:none;text-align:center;padding:20px;z-index:5}
 #sidebar{width:340px;background:#1e1e1e;border-left:1px solid #333;display:flex;flex-direction:column;flex-shrink:0}
 #sidebar-header{padding:8px 12px;background:#242424;border-bottom:1px solid #333;display:flex;justify-content:space-between;align-items:center}
 #sidebar-header h3{margin:0;color:#d4a95a;font-size:14px}
@@ -51,13 +53,12 @@ body{margin:0;font-family:system-ui,-apple-system,sans-serif;background:#1a1a1a;
 .char-delete:hover{background:#c05050}
 .char-body{padding:8px 10px;font-size:11px;font-family:monospace;white-space:pre-wrap;color:#bbb;border-top:1px solid #333;max-height:300px;overflow-y:auto}
 .char-body b{color:#d4a95a}
-#dice-panel{position:fixed;right:356px;bottom:16px;background:#242424;border:1px solid #444;border-radius:8px;padding:12px;min-width:240px;max-width:320px;max-height:50vh;display:flex;flex-direction:column;box-shadow:0 4px 20px rgba(0,0,0,.6);z-index:20}
+#dice-panel{background:#242424;border:1px solid #444;border-radius:8px;padding:12px;display:flex;flex-direction:column;box-shadow:0 4px 20px rgba(0,0,0,.6);z-index:20;margin:10px;flex:1;overflow-y:auto}
 #dice-panel h3{margin:0 0 8px;color:#d4a95a;font-size:14px}
-#dice-result{display:flex;flex-wrap:wrap;gap:6px;overflow-y:auto;padding:4px 0;flex:1}
+#dice-result{display:flex;flex-wrap:wrap;gap:6px;overflow-y:auto;padding:4px 0;flex:1;min-height:40px}
 .die{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:34px;padding:0 8px;background:#1a1a1a;border:2px solid #444;border-radius:6px;font-weight:bold;font-size:16px;color:#e0e0e0}
 .die.high{border-color:#5ae05a;color:#5ae05a;background:#1a2a1a}
-#dice-success{margin-top:8px;font-size:13px;color:#d4a95a;font-weight:bold;border-top:1px solid #333;padding-top:8px;display:none;}
-#hint{position:fixed;top:64px;left:12px;background:#242424;border:1px solid #333;border-radius:6px;padding:6px 10px;font-size:11px;color:#888;z-index:5;max-width:340px}
+#dice-success{margin-top:8px;font-size:13px;color:#d4a95a;font-weight:bold;border-top:1px solid #333;padding-top:8px;display:none}
 #music-panel{margin-top:12px;padding-top:12px;border-top:1px solid #333}
 #music-panel h3{margin:0 0 8px;color:#d4a95a;font-size:14px}
 .music-input-row{display:flex;gap:4px;margin-bottom:8px}
@@ -68,24 +69,29 @@ body{margin:0;font-family:system-ui,-apple-system,sans-serif;background:#1a1a1a;
 #yt-embed{height:140px;background:#000;border-radius:4px;overflow:hidden;display:flex;align-items:center;justify-content:center}
 #yt-embed iframe{width:100%;height:100%;border:0;display:block}
 .music-empty{color:#555;font-size:11px;text-align:center;padding:10px}
-.music-hint{font-size:10px;color:#666;margin-top:4px;line-height:1.3}
+#mobile-nav {display:none; height:60px; background:#242424; border-top:1px solid #333; flex-shrink:0}
+#mobile-nav button {flex:1; background:none; border:none; color:#888; font-size:11px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; font-weight:bold; cursor:pointer}
+#mobile-nav button.active {color:#d4a95a; background:#2a2a2a}
+#mobile-nav button svg {width:20px; height:20px; fill:currentColor}
+#hint{position:fixed;top:64px;left:12px;background:#242424;border:1px solid #333;border-radius:6px;padding:6px 10px;font-size:11px;color:#888;z-index:5;max-width:340px}
 @media (max-width: 768px) {
-  #main { flex-direction: column; }
-  #board { flex: 2; min-height: 60vh; }
-  #sidebar { width: 100%; flex: 1; border-left: none; border-top: 1px solid #333; max-height: 35vh; }
-  #dice-panel { position: static; margin: 10px; width: auto; max-width: none; max-height: none; box-shadow: none; }
+  #toolbar { height: 50px; padding: 0 8px; gap: 6px; }
+  #toolbar button { padding: 4px 8px; font-size: 12px; }
+  #toolbar label { display: none; }
+  #desktop-layout { display: none; }
+  #mobile-nav { display: flex; }
+  #board-mobile { min-height: 100%; }
+  #dice-panel-mobile { margin: 8px; border-radius: 8px; }
   #hint { display: none; }
-  #toolbar { height: auto; flex-wrap: wrap; padding: 6px; gap: 6px; }
-  #music-panel { display: none; }
 }
 </style>
 </head>
 <body>
 
 <div id="toolbar">
-  <button id="btn-map">Загрузить карту</button>
+  <button id="btn-map">Карта</button>
   <input type="file" id="map-input" accept="image/*" style="display:none">
-  <button class="secondary" id="btn-clear">Очистить рисунок</button>
+  <button class="secondary" id="btn-clear">Сброс</button>
   <button class="secondary" id="btn-clear-map">Удалить карту</button>
   <label>Размер:</label>
   <input type="number" id="brush-size" min="1" max="50" value="4">
@@ -99,44 +105,79 @@ body{margin:0;font-family:system-ui,-apple-system,sans-serif;background:#1a1a1a;
     </div>
   </div>
   <button class="secondary" id="btn-eraser">Ластик</button>
-  <span style="flex:1"></span>
-  <label>Кубы к6:</label>
-  <input type="number" id="dice-count" min="1" max="100" value="1">
-  <button id="btn-roll">Бросить</button>
 </div>
 
 <div id="main">
-  <div id="board">
-    <div id="drop-zone">Перетащите сюда карту (PNG/JPG) для игры</div>
-    <div id="canvas-wrap">
-      <img id="bg-image" alt="">
-      <canvas id="draw-canvas"></canvas>
+  <div id="desktop-layout">
+    <div id="board">
+      <div id="drop-zone">Перетащите сюда карту (PNG/JPG) для игры</div>
+      <div id="canvas-wrap">
+        <img id="bg-image" alt="">
+        <canvas id="draw-canvas"></canvas>
+      </div>
+    </div>
+    <div id="sidebar">
+      <div id="sidebar-header">
+        <h3>Чарлисты игроков</h3>
+        <button id="btn-load-char">+ Загрузить JSON</button>
+        <input type="file" id="char-input" accept=".json,application/json" style="display:none" multiple>
+      </div>
+      <div id="char-list"></div>
+    </div>
+    <div id="dice-panel" style="position:fixed; right:356px; bottom:16px; width:320px; max-height:50vh;">
+      <h3>Результаты броска</h3>
+      <div id="dice-result"><span style="color:#666;font-size:12px">Ещё не бросали</span></div>
+      <div id="dice-success"><b>Успехи:</b> 0</div>
+      <div id="music-panel">
+        <h3>Музыка (YouTube)</h3>
+        <div class="music-input-row">
+          <input type="text" id="yt-url" placeholder="Ссылка на видео или плейлист">
+          <button id="btn-yt-load">OK</button>
+        </div>
+        <div id="yt-embed">
+          <div class="music-empty">Вставь ссылку и нажми OK</div>
+        </div>
+      </div>
     </div>
   </div>
-  <div id="sidebar">
-    <div id="sidebar-header">
-      <h3>Чарлисты игроков</h3>
-      <button id="btn-load-char">+ Загрузить JSON</button>
-      <input type="file" id="char-input" accept=".json,application/json" style="display:none" multiple>
+
+  <div class="mobile-pane active" id="mobile-board">
+    <div id="board-mobile" style="flex:1; position:relative; background:#111; overflow:hidden; display:flex; flex-direction:column;">
+      <div id="drop-zone-mobile" style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:#666; font-size:16px; pointer-events:none; text-align:center; padding:20px; z-index:5;">Нажмите "Карта" сверху</div>
     </div>
-    <div id="char-list"></div>
+  </div>
+
+  <div class="mobile-pane" id="mobile-chars">
+    <div id="sidebar-mobile" style="flex:1; display:flex; flex-direction:column;">
+      <div id="sidebar-header-mobile" style="padding:8px 12px; background:#242424; border-bottom:1px solid #333; display:flex; justify-content:space-between; align-items:center;">
+        <h3 style="margin:0; color:#d4a95a; font-size:14px;">Чарлисты</h3>
+        <button id="btn-load-char-mobile" style="background:#444; color:#e0e0e0; border:none; padding:3px 8px; border-radius:4px; cursor:pointer; font-size:11px;">+ Загрузить</button>
+      </div>
+      <div id="char-list-mobile" style="flex:1; overflow-y:auto; padding:8px;"></div>
+    </div>
+  </div>
+
+  <div class="mobile-pane" id="mobile-dice">
+    <div id="dice-panel-mobile" style="flex:1; margin:10px; background:#242424; border:1px solid #444; border-radius:8px; padding:12px; display:flex; flex-direction:column;">
+      <h3 style="margin:0 0 8px; color:#d4a95a; font-size:14px;">Кубы</h3>
+      <div style="display:flex; gap:8px; margin-bottom:10px;">
+        <input type="number" id="dice-count-mobile" min="1" max="100" value="1" style="flex:1; background:#1a1a1a; color:#e0e0e0; border:1px solid #444; padding:8px; border-radius:4px; font-size:16px; text-align:center;">
+        <button id="btn-roll-mobile" style="flex:2; background:#d4a95a; color:#1a1a1a; border:none; padding:8px; border-radius:4px; cursor:pointer; font-weight:bold; font-size:16px;">Бросить</button>
+      </div>
+      <div id="dice-result-mobile" style="flex:1; overflow-y:auto; display:flex; flex-wrap:wrap; gap:8px; align-content:flex-start; margin-bottom:10px;">
+         <span style="color:#666; font-size:12px;">Ещё не бросали</span>
+      </div>
+      <div id="dice-success-mobile" style="font-size:16px; color:#d4a95a; font-weight:bold; border-top:1px solid #333; padding-top:10px; display:none;">
+        <b>Успехи:</b> 0
+      </div>
+    </div>
   </div>
 </div>
 
-<div id="dice-panel">
-  <h3>Результаты броска</h3>
-  <div id="dice-result"><span style="color:#666;font-size:12px">Ещё не бросали</span></div>
-  <div id="dice-success"><b>Успехи:</b> 0</div>
-  <div id="music-panel">
-    <h3>Музыка (YouTube)</h3>
-    <div class="music-input-row">
-      <input type="text" id="yt-url" placeholder="Ссылка на видео или плейлист">
-      <button id="btn-yt-load">OK</button>
-    </div>
-    <div id="yt-embed">
-      <div class="music-empty">Вставь ссылку и нажми OK</div>
-    </div>
-  </div>
+<div id="mobile-nav">
+  <button class="active" data-tab="board"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zM7 10h2v7H7zm4-3h2v10h-2zm4 6h2v4h-2z"/></svg>Доска</button>
+  <button data-tab="chars"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>Игроки</button>
+  <button data-tab="dice"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM7.5 16.5c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm0-9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm9 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm0-9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm-4.5 4.5c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/></svg>Кубы</button>
 </div>
 
 <script>
@@ -195,24 +236,32 @@ document.addEventListener('click', e => {
 });
 setColor(currentColor);
 
-const diceBtn = document.getElementById('btn-roll');
 const diceResult = document.getElementById('dice-result');
+const diceResultMobile = document.getElementById('dice-result-mobile');
 const diceSuccess = document.getElementById('dice-success');
+const diceSuccessMobile = document.getElementById('dice-success-mobile');
 
-diceBtn.onclick = () => {
-  const n = Math.max(1, Math.min(100, parseInt(document.getElementById('dice-count').value) || 1));
+function doRoll() {
+  const isMobile = window.innerWidth <= 768;
+  const input = isMobile ? document.getElementById('dice-count-mobile') : document.getElementById('dice-count');
+  const n = Math.max(1, Math.min(100, parseInt(input.value) || 1));
   const rolls = [];
   for (let i = 0; i < n; i++) rolls.push(1 + Math.floor(Math.random() * 6));
   
-  diceResult.innerHTML = rolls.map(r => `<span class="die ${r >= 5 ? 'high' : ''}">${r}</span>`).join('');
-  const successes = rolls.filter(r => r >= 5).length;
-  diceSuccess.style.display = 'block';
-  diceSuccess.innerHTML = `<b>Успехи:</b> ${successes}`;
+  const html = rolls.map(r => `<span class="die ${r >= 5 ? 'high' : ''}">${r}</span>`).join('');
+  const succ = rolls.filter(r => r >= 5).length;
+  const succHtml = `<b>Успехи:</b> ${succ}`;
+  
+  if (diceResult) { diceResult.innerHTML = html; diceSuccess.style.display = 'block'; diceSuccess.innerHTML = succHtml; }
+  if (diceResultMobile) { diceResultMobile.innerHTML = html; diceSuccessMobile.style.display = 'block'; diceSuccessMobile.innerHTML = succHtml; }
   
   if (ws && ws.readyState === WebSocket.OPEN) {
     ws.send(JSON.stringify({ type: 'roll', roll: rolls }));
   }
-};
+}
+
+document.getElementById('btn-roll').onclick = doRoll;
+document.getElementById('btn-roll-mobile').onclick = doRoll;
 
 const ytUrlInput = document.getElementById('yt-url');
 const btnYtLoad = document.getElementById('btn-yt-load');
@@ -221,10 +270,7 @@ const ytEmbed = document.getElementById('yt-embed');
 function loadYT(urlOverride) {
   const url = urlOverride || ytUrlInput.value.trim();
   if (!url) return;
-  
-  if (!urlOverride && ws && ws.readyState === WebSocket.OPEN) {
-    ws.send(JSON.stringify({ type: 'music', url: url }));
-  }
+  if (!urlOverride && ws && ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type: 'music', url: url }));
 
   let embedUrl = '';
   const listMatch = url.match(/[?&]list=([a-zA-Z0-9_-]+)/);
@@ -240,19 +286,15 @@ function loadYT(urlOverride) {
     }
   }
 
-  if (embedUrl) {
-    ytEmbed.innerHTML = '<iframe src="' + embedUrl + '" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>';
-  }
+  if (embedUrl) ytEmbed.innerHTML = '<iframe src="' + embedUrl + '" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>';
 }
 
 btnYtLoad.onclick = () => loadYT();
-ytUrlInput.addEventListener('keydown', e => {
-  if (e.key === 'Enter') loadYT();
-});
+ytUrlInput.addEventListener('keydown', e => { if (e.key === 'Enter') loadYT(); });
 
-const board = document.getElementById('board');
-const dropZone = document.getElementById('drop-zone');
-const wrap = document.getElementById('canvas-wrap');
+const canvasWrap = document.getElementById('canvas-wrap');
+const boardDesktop = document.getElementById('board');
+const dropZoneDesktop = document.getElementById('drop-zone');
 const bgImg = document.getElementById('bg-image');
 const canvas = document.getElementById('draw-canvas');
 const ctx = canvas.getContext('2d');
@@ -265,15 +307,17 @@ let isDrawing = false;
 let lastX = 0, lastY = 0;
 
 function fitWrap() {
-  const bw = board.clientWidth, bh = board.clientHeight;
+  const isMobile = window.innerWidth <= 768;
+  const currentBoard = isMobile ? document.getElementById('board-mobile') : boardDesktop;
+  const bw = currentBoard.clientWidth, bh = currentBoard.clientHeight;
   const iw = canvas.width || 1;
   const ih = canvas.height || 1;
   const scale = Math.min(bw / iw, bh / ih, 1);
   const dw = iw * scale, dh = ih * scale;
-  wrap.style.width = dw + 'px';
-  wrap.style.height = dh + 'px';
-  wrap.style.left = ((bw - dw) / 2) + 'px';
-  wrap.style.top = ((bh - dh) / 2) + 'px';
+  canvasWrap.style.width = dw + 'px';
+  canvasWrap.style.height = dh + 'px';
+  canvasWrap.style.left = ((bw - dw) / 2) + 'px';
+  canvasWrap.style.top = ((bh - dh) / 2) + 'px';
   bgImg.style.width = dw + 'px';
   bgImg.style.height = dh + 'px';
   canvas.style.width = dw + 'px';
@@ -288,14 +332,15 @@ function resetCanvas(w, h) {
 }
 
 function loadMap(src, isRemote) {
-  if (!isRemote && ws && ws.readyState === WebSocket.OPEN) {
-    ws.send(JSON.stringify({ type: 'map', url: src }));
-  }
+  if (!isRemote && ws && ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type: 'map', url: src }));
   
-  bgImg.style.display = 'block'; // На случай, если карта была удалена
+  bgImg.style.display = 'block';
   bgImg.src = src;
   bgImg.onload = () => {
-    dropZone.style.display = 'none';
+    const dz1 = document.getElementById('drop-zone');
+    const dz2 = document.getElementById('drop-zone-mobile');
+    if (dz1) dz1.style.display = 'none';
+    if (dz2) dz2.style.display = 'none';
     resetCanvas(bgImg.naturalWidth, bgImg.naturalHeight);
     fitWrap();
   };
@@ -313,32 +358,27 @@ function handleMapFile(f) {
       const c = document.createElement('canvas');
       c.width = w; c.height = h;
       c.getContext('2d').drawImage(img, 0, 0, w, h);
-      const compressed = c.toDataURL('image/jpeg', 0.7);
-      loadMap(compressed, false);
+      loadMap(c.toDataURL('image/jpeg', 0.7), false);
     };
     img.src = ev.target.result;
   };
   reader.readAsDataURL(f);
 }
 
-mapInput.onchange = e => {
-  const f = e.target.files[0];
-  if (f) handleMapFile(f);
-};
+mapInput.onchange = e => { const f = e.target.files[0]; if (f) handleMapFile(f); };
 
-['dragenter', 'dragover'].forEach(ev => {
-  board.addEventListener(ev, e => { e.preventDefault(); dropZone.classList.add('dragover'); });
-});
-['dragleave', 'drop'].forEach(ev => {
-  board.addEventListener(ev, e => { e.preventDefault(); dropZone.classList.remove('dragover'); });
-});
-board.addEventListener('drop', e => {
-  const f = e.dataTransfer.files[0];
-  if (f) {
-    if (f.type.startsWith('image/')) handleMapFile(f);
-    else if (f.name.endsWith('.json')) addCharFromFile(f);
-  }
-});
+function setupDragDrop(zone) {
+  ['dragenter', 'dragover'].forEach(ev => zone.addEventListener(ev, e => { e.preventDefault(); zone.classList.add('dragover'); }));
+  ['dragleave', 'drop'].forEach(ev => zone.addEventListener(ev, e => { e.preventDefault(); zone.classList.remove('dragover'); }));
+  zone.addEventListener('drop', e => {
+    const f = e.dataTransfer.files[0];
+    if (f) {
+      if (f.type.startsWith('image/')) handleMapFile(f);
+      else if (f.name.endsWith('.json')) addCharFromFile(f);
+    }
+  });
+}
+setupDragDrop(document.getElementById('board'));
 
 function getPos(e) {
   const r = canvas.getBoundingClientRect();
@@ -350,9 +390,7 @@ function saveHistory() {
   history.push(ctx.getImageData(0, 0, canvas.width, canvas.height));
 }
 
-function brushSize() {
-  return Math.max(1, Math.min(50, parseInt(brushInput.value) || 4));
-}
+function brushSize() { return Math.max(1, Math.min(50, parseInt(brushInput.value) || 4)); }
 
 function drawLine(line) {
   ctx.beginPath();
@@ -388,22 +426,13 @@ canvas.addEventListener('pointerdown', e => {
 canvas.addEventListener('pointermove', e => {
   if (!isDrawing) return;
   const p = getPos(e);
-  const line = {
-    x1: lastX, y1: lastY, x2: p.x, y2: p.y,
-    color: currentColor, size: brushSize(), eraser: eraserMode
-  };
+  const line = { x1: lastX, y1: lastY, x2: p.x, y2: p.y, color: currentColor, size: brushSize(), eraser: eraserMode };
   drawLine(line);
-  
-  if (ws && ws.readyState === WebSocket.OPEN) {
-    ws.send(JSON.stringify({ type: 'draw', line: line }));
-  }
-  
+  if (ws && ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type: 'draw', line: line }));
   lastX = p.x; lastY = p.y;
 });
 
-['pointerup', 'pointercancel', 'pointerleave'].forEach(ev => {
-  canvas.addEventListener(ev, () => { isDrawing = false; });
-});
+['pointerup', 'pointercancel', 'pointerleave'].forEach(ev => canvas.addEventListener(ev, () => { isDrawing = false; }));
 
 document.addEventListener('keydown', e => {
   if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
@@ -416,24 +445,26 @@ document.getElementById('btn-clear').onclick = () => {
   if (!confirm('Очистить рисунок?')) return;
   saveHistory();
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  if (ws && ws.readyState === WebSocket.OPEN) {
-    ws.send(JSON.stringify({ type: 'clear_drawings' }));
-  }
+  if (ws && ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type: 'clear_drawings' }));
 };
-document.getElementById('btn-clear-map').onclick = () => {
-  if (!confirm('Удалить карту для всех?')) return;
-  
+
+function clearMapUI() {
   bgImg.src = '';
   bgImg.style.display = 'none';
-  dropZone.style.display = 'flex';
-  // Не трогаем canvas.width и canvas.height, просто очищаем рисунок
+  const dz1 = document.getElementById('drop-zone');
+  const dz2 = document.getElementById('drop-zone-mobile');
+  if (dz1) dz1.style.display = 'flex';
+  if (dz2) dz2.style.display = 'flex';
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   history = [];
-  
-  if (ws && ws.readyState === WebSocket.OPEN) {
-    ws.send(JSON.stringify({ type: 'clear_map' }));
-  }
+}
+
+document.getElementById('btn-clear-map').onclick = () => {
+  if (!confirm('Удалить карту для всех?')) return;
+  clearMapUI();
+  if (ws && ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type: 'clear_map' }));
 };
+
 document.getElementById('btn-eraser').onclick = () => {
   eraserMode = !eraserMode;
   colorCurrent.style.borderColor = eraserMode ? '#d4a95a' : '#fff';
@@ -519,132 +550,123 @@ function escapeHtml(s) {
 }
 
 function addChar(data, isRemote) {
-  if (!isRemote && ws && ws.readyState === WebSocket.OPEN) {
-    ws.send(JSON.stringify({ type: 'char', char: data }));
-  }
+  if (!isRemote && ws && ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type: 'char', char: data }));
   
   const list = document.getElementById('char-list');
-  const card = document.createElement('div');
-  card.className = 'char-card';
+  const listMobile = document.getElementById('char-list-mobile');
   
-  const header = document.createElement('div');
-  header.className = 'char-card-header';
-  header.innerHTML = `
-    <div>
-      <div class="char-name">${escapeHtml(data.name || 'Безымянный')}</div>
-      <div class="char-sub">${escapeHtml(RACE_NAMES[data.race]||'')} · ${escapeHtml(CLASSES_NAMES[data.class]||'')}</div>
-    </div>
-    <button class="char-delete" title="Удалить">×</button>
-  `;
-  
-  const body = document.createElement('div');
-  body.className = 'char-body';
-  body.style.display = 'none';
-  body.innerHTML = buildCharHtml(data);
-  
-  header.querySelector('.char-delete').onclick = e => {
-    e.stopPropagation();
-    if (confirm('Удалить?')) {
-      const cards = Array.from(list.children);
-      const idx = cards.indexOf(card);
-      card.remove();
-      if (ws && ws.readyState === WebSocket.OPEN) {
-        ws.send(JSON.stringify({ type: 'remove_char', index: idx }));
+  function makeCard() {
+    const card = document.createElement('div');
+    card.className = 'char-card';
+    const header = document.createElement('div');
+    header.className = 'char-card-header';
+    header.innerHTML = `<div><div class="char-name">${escapeHtml(data.name || 'Безымянный')}</div><div class="char-sub">${escapeHtml(RACE_NAMES[data.race]||'')} · ${escapeHtml(CLASSES_NAMES[data.class]||'')}</div></div><button class="char-delete" title="Удалить">×</button>`;
+    const body = document.createElement('div');
+    body.className = 'char-body';
+    body.style.display = 'none';
+    body.innerHTML = buildCharHtml(data);
+    
+    header.querySelector('.char-delete').onclick = e => {
+      e.stopPropagation();
+      if (confirm('Удалить?')) {
+        const cards = Array.from(card.parentElement.children);
+        const idx = cards.indexOf(card);
+        card.remove();
+        const otherList = card.parentElement === list ? listMobile : list;
+        if (otherList && otherList.children[idx]) otherList.children[idx].remove();
+        if (ws && ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type: 'remove_char', index: idx }));
       }
-    }
-  };
-  
-  header.onclick = () => {
-    body.style.display = body.style.display === 'none' ? 'block' : 'none';
-  };
-  
-  card.appendChild(header);
-  card.appendChild(body);
-  list.appendChild(card);
+    };
+    header.onclick = () => { body.style.display = body.style.display === 'none' ? 'block' : 'none'; };
+    card.appendChild(header);
+    card.appendChild(body);
+    return card;
+  }
+
+  if (list) list.appendChild(makeCard());
+  if (listMobile) listMobile.appendChild(makeCard());
 }
 
 function addCharFromFile(f) {
   const reader = new FileReader();
   reader.onload = ev => {
-    try {
-      const data = JSON.parse(ev.target.result);
-      if (data && typeof data === 'object') addChar(data, false);
-    } catch (e) { alert('Ошибка JSON'); }
+    try { const data = JSON.parse(ev.target.result); if (data && typeof data === 'object') addChar(data, false); } catch (e) { alert('Ошибка JSON'); }
   };
   reader.readAsText(f);
 }
 
 const charInput = document.getElementById('char-input');
 document.getElementById('btn-load-char').onclick = () => charInput.click();
-charInput.onchange = e => {
-  for (const f of e.target.files) addCharFromFile(f);
-  charInput.value = '';
-};
+document.getElementById('btn-load-char-mobile').onclick = () => charInput.click();
+charInput.onchange = e => { for (const f of e.target.files) addCharFromFile(f); charInput.value = ''; };
 
 const sidebar = document.getElementById('sidebar');
-['dragenter', 'dragover'].forEach(ev => {
-  sidebar.addEventListener(ev, e => { e.preventDefault(); e.stopPropagation(); });
-});
+['dragenter', 'dragover'].forEach(ev => sidebar.addEventListener(ev, e => { e.preventDefault(); e.stopPropagation(); }));
 sidebar.addEventListener('drop', e => {
-  e.preventDefault();
-  e.stopPropagation();
-  for (const f of e.dataTransfer.files) {
-    if (f.name.endsWith('.json')) addCharFromFile(f);
-  }
+  e.preventDefault(); e.stopPropagation();
+  for (const f of e.dataTransfer.files) if (f.name.endsWith('.json')) addCharFromFile(f);
 });
+
+document.querySelectorAll('#mobile-nav button').forEach(btn => {
+  btn.onclick = () => {
+    document.querySelectorAll('#mobile-nav button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.mobile-pane').forEach(p => p.classList.remove('active'));
+    document.getElementById('mobile-' + btn.dataset.tab).classList.add('active');
+    
+    if (btn.dataset.tab === 'board') {
+      const bm = document.getElementById('board-mobile');
+      const dz2 = document.getElementById('drop-zone-mobile');
+      if (canvasWrap && bm && !bm.contains(canvasWrap)) {
+        bm.appendChild(canvasWrap);
+      }
+      setTimeout(fitWrap, 50);
+    }
+  };
+});
+
+const isMobile = window.innerWidth <= 768;
+if (isMobile) document.getElementById('board-mobile').appendChild(canvasWrap);
 
 const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
 const ws = new WebSocket(`${protocol}//${window.location.host}`);
 
 ws.onmessage = (event) => {
   const data = JSON.parse(event.data);
-
   if (data.type === 'init') {
     if (data.state.mapUrl) loadMap(data.state.mapUrl, true);
-    if (data.state.musicUrl) {
-      ytUrlInput.value = data.state.musicUrl;
-      loadYT(data.state.musicUrl);
-    }
-    
-    // Восстанавливаем рисунки
+    if (data.state.musicUrl) { ytUrlInput.value = data.state.musicUrl; loadYT(data.state.musicUrl); }
     data.state.drawings.forEach(line => drawLine(line));
-    
-    // Восстанавливаем чарлистов
     data.state.characters.forEach(char => addChar(char, true));
-    
-    // Восстанавливаем последний бросок
     if (data.state.diceHistory && data.state.diceHistory.length) {
-      diceResult.innerHTML = data.state.diceHistory.map(r => `<span class="die ${r >= 5 ? 'high' : ''}">${r}</span>`).join('');
-      const successes = data.state.diceHistory.filter(r => r >= 5).length;
-      diceSuccess.style.display = 'block';
-      diceSuccess.innerHTML = `<b>Успехи:</b> ${successes}`;
+      const html = data.state.diceHistory.map(r => `<span class="die ${r >= 5 ? 'high' : ''}">${r}</span>`).join('');
+      const succ = data.state.diceHistory.filter(r => r >= 5).length;
+      if (diceResult) diceResult.innerHTML = html;
+      if (diceSuccess) { diceSuccess.style.display = 'block'; diceSuccess.innerHTML = `<b>Успехи:</b> ${succ}`; }
+      if (diceResultMobile) diceResultMobile.innerHTML = html;
+      if (diceSuccessMobile) { diceSuccessMobile.style.display = 'block'; diceSuccessMobile.innerHTML = `<b>Успехи:</b> ${succ}`; }
     }
   }
-   else if (data.type === 'clear_map') {
-    bgImg.src = '';
-    bgImg.style.display = 'none';
-    dropZone.style.display = 'flex';
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    history = [];
-  }
+  else if (data.type === 'clear_map') clearMapUI();
   else if (data.type === 'draw') drawLine(data.line);
   else if (data.type === 'clear_drawings') ctx.clearRect(0, 0, canvas.width, canvas.height);
   else if (data.type === 'map') loadMap(data.url, true);
   else if (data.type === 'roll') {
-    diceResult.innerHTML = data.roll.map(r => `<span class="die ${r >= 5 ? 'high' : ''}">${r}</span>`).join('');
-    const successes = data.roll.filter(r => r >= 5).length;
-    diceSuccess.style.display = 'block';
-    diceSuccess.innerHTML = `<b>Успехи:</b> ${successes}`;
+    const html = data.roll.map(r => `<span class="die ${r >= 5 ? 'high' : ''}">${r}</span>`).join('');
+    const succ = data.roll.filter(r => r >= 5).length;
+    if (diceResult) diceResult.innerHTML = html;
+    if (diceSuccess) { diceSuccess.style.display = 'block'; diceSuccess.innerHTML = `<b>Успехи:</b> ${succ}`; }
+    if (diceResultMobile) diceResultMobile.innerHTML = html;
+    if (diceSuccessMobile) { diceSuccessMobile.style.display = 'block'; diceSuccessMobile.innerHTML = `<b>Успехи:</b> ${succ}`; }
   }
   else if (data.type === 'char') addChar(data.char, true);
   else if (data.type === 'remove_char') {
-    const cards = document.querySelectorAll('.char-card');
-    if (cards[data.index]) cards[data.index].remove();
+    const list = document.getElementById('char-list');
+    const listMobile = document.getElementById('char-list-mobile');
+    if (list && list.children[data.index]) list.children[data.index].remove();
+    if (listMobile && listMobile.children[data.index]) listMobile.children[data.index].remove();
   }
-  else if (data.type === 'music') {
-    ytUrlInput.value = data.url;
-    loadYT(data.url);
-  }
+  else if (data.type === 'music') { ytUrlInput.value = data.url; loadYT(data.url); }
 };
 </script>
 </body>
